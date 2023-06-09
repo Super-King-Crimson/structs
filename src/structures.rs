@@ -113,6 +113,7 @@ fn explain_unit_like_structs() {
     //(they're called unit-like structs) because they are like a unit (remember the () tuple)
 
     //No curly braces, parentheses, nothing!
+    //Oh btw the name convention for structs is CamelCase
     struct AlwaysEqual;
     let idk = AlwaysEqual;
 
@@ -136,7 +137,7 @@ fn explain_field_borrowing() {
 
     let mut input = String::new();
 
-    println!("How many steps right would you like to take?");
+    println!("You are at the origin.\n How many steps right would you like to take?");
     io::stdin().read_line(&mut input).expect("Expected to read input");
     println!("{input}");
     *hunt_x += input.trim().parse::<i64>().expect("Expected a number input");
@@ -149,4 +150,110 @@ fn explain_field_borrowing() {
     *hunt_y += input.trim().parse::<i64>().expect("Expected a number input");
 
     println!("You are now at ({}, {})", treasure_hunt.x, treasure_hunt.y);
+
+    //That's it!
+}
+
+
+/*
+ *
+ * END
+ * OF
+ * SECTION
+ * 
+*/
+
+
+//Now, let's make an example program with structs
+pub fn explain() {
+    //But to know something's value we have to do things without it, so...
+    calculate_area_of_rectangle();
+}
+
+
+struct Rectangle {
+    length: u32,
+    width: u32
+}
+
+fn calculate_area_of_rectangle() {
+    let l = 10;
+    let w = 20;
+    println!("The area is {} square pixels", area_1(l, w));
+
+    let lw = (10, 20);
+    println!("The area is {} square pixels", area_2(lw));
+
+    let rect = Rectangle { length: 10, width: 20 };
+    println!("The area is {} square pixels", area_3(&rect));
+
+    derived_traits();
+}
+
+
+fn area_1(length: u32, width: u32) -> u32 {
+    //ok, this is alright, but at face-value this function just multiplies two unrelated numbers together
+    //While it accepts two arguments, there's no indication that they're related
+    length * width
+}
+
+
+fn area_2 (dimensions: (u32, u32)) -> u32 {
+    //Ok, good! Now we know that the two numbers are related.
+    //But since tuples don't have names, we don't know how they're related: which is width, which is height?
+    dimensions.0 * dimensions.1
+}
+
+
+//reference so we the function doesn't consume ownership!
+fn area_3(rectangle: &Rectangle) -> u32 {
+    //perfect! We're returning the area, calculated from the triangle's length and width
+    rectangle.length * rectangle.width
+}
+
+
+struct Triangle {
+    base: u32,
+    height: u32
+}
+
+fn derived_traits() {  
+    //Obviously, we can't print a triangle. But what if we could? Let's listen to the compiler:
+    let tri = Triangle { base: 15, height: 50 };
+
+    // println!("{tri}");
+    // = help: the trait `std::fmt::Display` is not implemented for `Rectangle`
+    // = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+ 
+    //Alright, let's use Debug output format by using {:?}
+    // println!("{:?}", tri);
+    // note: add `#[derive(Debug)]` to `Triangle` or manually `impl Debug for Triangle`
+
+
+    //Okay then, let's add the #[derive(Debug)] thing to a new struct
+    #[derive(Debug)]
+    struct DebugTriangle {
+        base: u32, 
+        height: u32 
+    }
+
+    let debug_tri = DebugTriangle { base: 15, height: 50 };
+    //WOAH!
+    println!("{:?}", debug_tri);
+    //Use :#? to make it *pretty*
+    println!("Here are the details, but prettier: {:#?}", debug_tri);
+    //We can also use the dbg! macro, which takes ownership of an expression,
+    //prints it with the line number and the evaluation of that expression, and returns ownership of that evaluation
+    let debug_tri_ = dbg!(DebugTriangle { base: 30, ..debug_tri });
+
+    // By default, the curly brackets tell println! to use formatting known as Display: output 
+    // intended for direct end user consumption. 
+    // The primitive types we’ve seen so far implement Display by default, 
+    // because there’s only one way you’d want to show a 1 or any other primitive type to a user. 
+    // But with structs, the way println! should format the output is less clear.
+
+    //Also dbg! prints to smthn called stderr instead of stdout (we'll talk about that later)
+
+
+    //We can also use the derive keyword to add custom behavior to structs (we'll talk about that later)
 }

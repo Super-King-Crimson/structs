@@ -1,5 +1,8 @@
-mod structure;
+mod structures;
+mod method_syntax;
 
 fn main() {
-    structure::introduce();
+    // structures::introduce();
+    // structures::explain();
+    method_syntax::explain();
 }
